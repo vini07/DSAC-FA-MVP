@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "lambton-wil-project1",
+  "private_key_id": "854033ce28879c01364eac5e0afbeef8bd807b27",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCySHuUJeaj2Jk3\nZ8QYtnj96j6FL+Q5MppLSzcRUS/aofRP5T4WVuWGT1Ay5C6n4dRSgawqvtwQTfYw\nrg1uYwJzlMsev+mnsP3uGxXrNuI8im0vNDmFtiFuq36a/2RdLpS5e4XbrFOaHphH\n4m8NIUJSWXdOiCcco02IEIT1IED9umTugZgKhzIxC1/OKq9yUnvYy4Ir1N6wqeBB\n1PToll83lRXX0NOlO6sBWHPZnJLYR9G6PeatjFqO20K5wkNeexWjqoFNEzsS6Jf6\nhQlN0HGoEeeYj4OHh36tAmWRq8Husr91qfzeuW+7E4UYOyI4DDccb1uI+mb54lhX\nKh+pzLRdAgMBAAECggEAErsdzLdcr4sysckDp8sIFDlXnzukYUQJRO7elsGuYuyQ\nFBLUPpmbnMxZczdZFYda/N4l3gnWahoeyweGXrolSEpyOsVUAavNSgZre551D4JF\nrWdxwbQceBmpgBRkEYwy0PgC3M0SrYcYXbkTDNCZPLismcIhRdd8bla5+V0NpvqQ\nym6+jQEObwDSpTHhHJS8DHxOn3NvGPMbGjlwsH9y93axPBcLZBq9wnk4mw2Xt7sK\n1526RgTip8+4t/x2P8JPiTIz7rdBsUUBR8mMH7jC8jb7eH/1fCDSh2iZi03OxCbh\n7qVEQ0q36gIF95ozEA+Jy3bt0uW0aW3wNVzF5wg6SwKBgQDqM+uo7Oo8G41TJV0+\nhmxUcezJsEVJBqvRBkjW4xqnO4EeERjnSUf17qnO8rfjKSKzsFGL9hUDJSoXPc7G\nFbHyRUuTQGhI4meGMjVONrv6afyL3Sn0+ajpmEmXrPqtkkwWHtHf/xJYguVIFyKy\neolvEAwl8JK/d4jerGOgncg1XwKBgQDC4DqMGOMom9mPvD8bNJdBB2qyngY0S4e3\nB8XvSftDujVdyVkKrHDb3KR0OUHd56q4Le3YfGtJ7Y3UXV086xKFCgUi6/+bfFfa\nomBHbt19Un9n+70UAc10jw53wHc5ulkpg8ly568mqL5++YqzqF7aTa9l72wyhMWR\n3B0Fm2oTwwKBgHgYI7G9uucTocaPFF9pgsdSm/9YWk72Esjelh9K2XIDu1P1pHWF\nSFc+COlL4Suk/lxx/37rsx6nwguk8BD3MwZurjBWCKPHJRrVSCxRONdR3eTChi9O\njmUqaCJU2z6CFG4LY8ee/oNQq83pvysSVsMS0Yfq8vUnkJHOiE/mWLG1AoGBAJJW\nCQD9C0+KQMRjqsvGITKu3BuG+Me6VA5IYwU+e9Uu9jYYJaoTNaiUNlYkTObSuWsW\n6j0fqP1ZyqBG/+Xn6/9FN/gyWb4rkFlYh438nYwnMA8ohaKJe/vkFQwt1hneamf3\nU4XanrccDfiRcOtaKugpX+Xe9VO2ShouvQhh3TU7AoGAYzD6uy/2m8cyTKaiEY85\n2yBUOPAWZT1K2x0W9HueBsX1bUkeoVpuN5kZxeEX4PMrVOZ34jLpGgGFtsAM4o8y\noRRcpf9U4bdMvkHEh9T9JLqTf3/0j0Xzcwc3jEKZJbrT2HMCSJmtiu7uPf6SMSTe\nglS5kNXvAb3A80HWSw5+wAE=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-az9ud@lambton-wil-project1.iam.gserviceaccount.com",
+  "client_id": "115259533397452482971",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-az9ud%40lambton-wil-project1.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
