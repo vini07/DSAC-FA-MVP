@@ -1,0 +1,265 @@
+import numpy as np
+import pandas as pd
+import yfinance as yf
+import datetime as dt
+from pandas_datareader import data as pdr
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from prophet import Prophet
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
+
+# def generate_stock_analysis_plot(df, macd, stoch, stock):
+#     # Existing plotting code, no changes needed
+#     # ...
+
+
+# class StockDataAnalyzer:
+#     # Existing code, no changes needed
+#     # ...
+def generate_stock_analysis_plot(df, macd, stoch, stock):
+    fig = make_subplots(
+        rows=4,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.01,
+        row_heights=[0.5, 0.1, 0.2, 0.2],
+    )
+
+    fig.add_trace(
+        go.Candlestick(
+            x=df.index,
+            open=df['Open'],
+            high=df['High'],
+            low=df['Low'],
+            close=df['Close'],
+            name='market data',
+        ),
+        row=1,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=df['MA5'],
+            opacity=0.7,
+            line=dict(color='blue', width=2),
+            name='MA 5',
+        ),
+        row=1,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=df['MA20'],
+            opacity=0.7,
+            line=dict(color='orange', width=2),
+            name='MA 20',
+        ),
+        row=1,
+        col=1,
+    )
+
+    colors = ['green' if row['Open'] - row['Close'] >= 0 else 'red' for _, row in df.iterrows()]
+    fig.add_trace(
+        go.Bar(
+            x=df.index,
+            y=df['Volume'],
+            marker_color=colors,
+        ),
+        row=2,
+        col=1,
+    )
+
+    colorsM = ['green' if val >= 0 else 'red' for val in macd.macd_diff()]
+    fig.add_trace(
+        go.Bar(
+            x=df.index,
+            y=macd.macd_diff(),
+            marker_color=colorsM,
+        ),
+        row=3,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=macd.macd(),
+            line=dict(color='black', width=2),
+        ),
+        row=3,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=macd.macd_signal(),
+            line=dict(color='blue', width=1),
+        ),
+        row=3,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=stoch.stoch(),
+            line=dict(color='black', width=2),
+        ),
+        row=4,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=stoch.stoch_signal(),
+            line=dict(color='blue', width=1),
+        ),
+        row=4,
+        col=1,
+    )
+
+    fig.update_layout(
+        height=900,
+        width=1200,
+        showlegend=False,
+        xaxis_rangeslider_visible=False,
+        title=stock + ' Live Share Price',
+        yaxis=dict(title='Stock Price (USD per Share)'),
+        yaxis2=dict(title='Volume'),
+        yaxis3=dict(title='MACD'),
+        yaxis4=dict(title='Stochastic'),
+    )
+
+    return fig
+
+
+class StockDataAnalyzer:
+    def __init__(self, stock, start_date, end_date):
+        self.stock = stock
+        self.start_date = start_date
+        self.end_date = end_date
+
+    def download_stock_data(self):
+        yf.pdr_override()
+        df = yf.download(
+            self.stock, start=self.start_date, end=self.end_date, progress=False
+        )
+        return df
+
+    def calculate_technical_indicators(self, df):
+        df['MA5'] = df['Close'].rolling(window=5).mean()
+        df['MA20'] = df['Close'].rolling(window=20).mean()
+
+        macd = MACD(
+            close=df['Close'], window_slow=26, window_fast=12, window_sign=9
+        )
+        stoch = StochasticOscillator(
+            high=df['High'], close=df['Close'], low=df['Low'], window=14, smooth_window=3
+        )
+
+        return df, macd, stoch
+    def run_analysis(self):
+        df = self.download_stock_data()
+        df, macd, stoch = self.calculate_technical_indicators(df)
+        self.forecast_stock_price(df)
+        return df, macd, stoch  # Return macd and stoch
+ #Existing code...
+    def forecast_stock_price(self, df):
+        # Prepare the data for Prophet
+        df_prophet = df.reset_index()[['Date', 'Close']].rename(columns={'Date': 'ds', 'Close': 'y'})
+
+        # Split data into train-test
+        train_size = int(len(df_prophet) * 0.8)
+        train_data, test_data = df_prophet[:train_size], df_prophet[train_size:]
+
+        # Instantiate the Prophet model
+        model = Prophet()
+
+        # Adding seasonality components
+        model.add_seasonality(name='yearly', period=365.25, fourier_order=10)
+        model.add_seasonality(name='weekly', period=7, fourier_order=3)
+
+        # Hyperparameter tuning
+        model.changepoint_prior_scale = 0.01
+        model.growth = 'linear'
+
+        # Fit the model to the training data
+        model.fit(train_data)
+
+        # Make future predictions on the test set
+        future = model.make_future_dataframe(periods=len(test_data))
+        forecast = model.predict(future)
+
+        # Calculate R-squared (R2) value for the forecast on the test set
+        df_forecast = forecast[['ds', 'yhat']].merge(test_data, on='ds', how='inner')
+        r2 = 1 - (np.sum((df_forecast['y'] - df_forecast['yhat']) ** 2) / np.sum((df_forecast['y'] - df_forecast['y'].mean()) ** 2))
+
+        # Plot the forecasted results along with R2 value
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(x=train_data['ds'], y=train_data['y'], mode='lines', name='Train Data'))
+        fig.add_trace(go.Scatter(x=test_data['ds'], y=test_data['y'], mode='lines', name='Test Data'))
+        fig.add_trace(go.Scatter(x=forecast['ds'], y=forecast['yhat'], mode='lines', name='Forecast'))
+
+        fig.update_layout(title_text=self.stock + ' Stock Price Forecast (R2={:.2f})'.format(r2),
+                          xaxis_title='Date',
+                          yaxis_title='Stock Price (USD per Share)',
+                          showlegend=True,
+                          height=600,
+                          width=1200)
+
+        fig.show()
+
+def run_dash_app(df, stock, macd, stoch, analyzer):  # Pass the analyzer instance as an argument
+    app = dash.Dash(__name__)
+
+    app.layout = html.Div([
+        dcc.Graph(id='historical-plot'),
+        dcc.Graph(id='forecast-plot'),
+        html.Button('Show Historical Plots', id='historical-button'),
+        html.Button('Show Forecast', id='forecast-button')
+    ])
+
+    @app.callback(
+        Output('historical-plot', 'figure'),
+        Output('forecast-plot', 'figure'),
+        Input('historical-button', 'n_clicks'),
+        Input('forecast-button', 'n_clicks')
+    )
+    def show_hide_plots(historical_clicks, forecast_clicks):
+        ctx = dash.callback_context
+        if not ctx.triggered:
+            return generate_stock_analysis_plot(df, macd, stoch, stock), {}
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        if button_id == 'historical-button':
+            return generate_stock_analysis_plot(df, macd, stoch, stock), {}
+        elif button_id == 'forecast-button':
+            return {}, analyzer.forecast_stock_price(df)  # Call forecast_stock_price method of StockDataAnalyzer
+        return generate_stock_analysis_plot(df, macd, stoch, stock), {}
+
+    if __name__ == '__main__':
+        app.run_server(debug=True)
+
+if __name__ == "__main__":
+    # Create input field for our desired stock
+    stock = input("Enter a stock ticker symbol: ")
+
+    # Define the start and end dates
+    start_date = "2021-01-01"
+    end_date = "2021-12-31"
+
+    # Instantiate the StockDataAnalyzer class
+    analyzer = StockDataAnalyzer(stock, start_date, end_date)
+
+    # Run the analysis and get macd and stoch
+    df, macd, stoch = analyzer.run_analysis()
+
+    # Run the Dash app with macd and stoch as arguments
+    run_dash_app(df, stock, macd, stoch, analyzer)
